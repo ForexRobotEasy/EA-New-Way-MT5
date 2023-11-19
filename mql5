@@ -1,0 +1,108 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                   EA New Way MT5 |
+//|                                                forexroboteasy.com |
+//|                                         Forex Robot Easy Team    |
+//+------------------------------------------------------------------+
+
+// Define necessary inputs for the EA
+input double LotSize = 0.01;
+input int MaxOrders = 5;
+input double Slippage = 3;
+input int MagicNumber = 12345;
+
+// Define necessary variables for the EA
+int totalOrders = 0;
+double previousPrice = 0;
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Initialize necessary variables
+    totalOrders = 0;
+    previousPrice = 0;
+
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Perform necessary clean up tasks
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Get current price
+    double currentPrice = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+
+    // Check if a new candle has formed
+    if (previousPrice != currentPrice)
+    {
+        // Calculate rate of price movement
+        double priceMovement = MathAbs(currentPrice - previousPrice);
+
+        // Check if price movement exceeds a threshold
+        if (priceMovement > 0.001)
+        {
+            // Determine market trend based on proprietary indicator
+            int trend = DetermineTrend();
+
+            // Check if it's a valid trend
+            if (trend != 0)
+            {
+                // Perform trading activities based on the trend
+                PerformTradingActivities(trend);
+            }
+        }
+
+        // Update previous price
+        previousPrice = currentPrice;
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Function to determine market trend                                |
+//+------------------------------------------------------------------+
+int DetermineTrend()
+{
+    // Implement trading strategies using proprietary indicator
+    // Strategy 1: Moving Average Crossover
+    // Strategy 2: Breakout
+    // Strategy 3: Trend Reversal
+
+    // Return the determined trend
+    return 1; // 1 for uptrend, -1 for downtrend, 0 for no trend
+}
+
+//+------------------------------------------------------------------+
+//| Function to perform trading activities based on the trend         |
+//+------------------------------------------------------------------+
+void PerformTradingActivities(const int trend)
+{
+    // Check if maximum number of orders is reached
+    if (totalOrders >= MaxOrders)
+        return;
+
+    // Place buy or sell order based on the trend
+    if (trend == 1)
+    {
+        // Place buy order
+        OrderSend(_Symbol, OP_BUY, LotSize, SymbolInfoDouble(_Symbol, SYMBOL_ASK), Slippage, 0, 0, '', MagicNumber);
+    }
+    else if (trend == -1)
+    {
+        // Place sell order
+        OrderSend(_Symbol, OP_SELL, LotSize, SymbolInfoDouble(_Symbol, SYMBOL_BID), Slippage, 0, 0, '', MagicNumber);
+    }
+
+    // Increment total number of orders
+    totalOrders++;
+}
